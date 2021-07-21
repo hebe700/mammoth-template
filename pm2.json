@@ -1,0 +1,17 @@
+{
+    "apps":[
+        {
+            "name":"server",
+            "script":"./app.js",
+            "instances":0,
+            "exec_mode":"cluster",
+            "watch":false,
+            "env": {
+                "NODE_ENV": "production"
+            },
+            "env_production": {
+                "NODE_ENV": "production"
+            }
+        }
+    ]
+}
