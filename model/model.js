@@ -1,18 +1,7 @@
 /*
 * 模型基类
 * */
-const mongoose=require('mongoose');
-
-// var mysql= require('mysql');
-// var connection = mysql.createConnection({
-//   host     : '47.96.173.6',
-//   user     : 'root',
-//   password : 'Fengye1945',
-//   database : 'mysql'
-// });
- 
-// connection.connect();
-
+const mongoose=require('mongoose')
 
 //超类
 const SuperClass=require('../common/class.js');
