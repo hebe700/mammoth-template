@@ -27,16 +27,6 @@ class Service extends SuperClass{
         })));
     }
 
-    /**
-     * 加入订单队列
-     */
-    async pushOrderQueue(taskName,taskValue){
-        return await this.io(this.redis.lpush('orderQueue',JSON.stringify({
-            name:taskName,
-            value:taskValue
-        })));
-    }
-
     //加入task延时任务
     async addTaskDelay(delayKey,taskTime,taskName,taskValue){
         //加入延时任务
@@ -56,25 +46,6 @@ class Service extends SuperClass{
         return this.rs(true);
     }
 
-    //加入order延时任务
-    async addOrderDelay(delayKey,taskTime,taskName,taskValue){
-        //加入延时任务
-        const delayDataKey=`1_delayData:${delayKey}`;
-        const resRedis=await Promise.all([
-            //任务
-            this.io(this.redis.zadd('delayQueue',taskTime,delayDataKey)),
-            //任务数据
-            this.io(this.redis.set(delayDataKey,JSON.stringify({
-                name:taskName,
-                value:taskValue
-            })))
-        ]);            
-        if(!resRedis[0].status || !resRedis[1].status){
-            return this.rs(false,this.redisErr);
-        }
-        return this.rs(true);
-    }
-
     //删除task延时任务
     async delTaskDelay(delayKey){
         const keyDelayTask=`0_delayData:${delayKey}`;
@@ -90,54 +61,9 @@ class Service extends SuperClass{
         return this.rs(true);
     }
 
-    //删除order延时任务
-    async delOrderDelay(delayKey){
-        const keyDelayTask=`1_delayData:${delayKey}`;
-        const redisRes=await Promise.all([
-            //删除任务
-            this.io(this.redis.zrem('delayQueue',keyDelayTask)),
-            //删除任务数据
-            this.io(this.redis.del(keyDelayTask))
-        ]);
-        if(!redisRes[0].status || !redisRes[1].status){
-            return this.rs(false,this.redisErr);
-        }
-        return this.rs(true);
-    }
-
     //获取task延时任务数据
     async getTaskDelay(delayKey){
         const keyDelayTask=`0_delayData:${delayKey}`;
-        const resRedis=await Promise.all([
-            //获取任务数据
-            this.io(this.redis.get(keyDelayTask)),
-            //取任务时间
-            this.io(this.redis.zscore('delayQueue',keyDelayTask)),
-        ]);
-        if(!resRedis[0].status || !resRedis[1].status){
-            return this.rs(false,this.redisErr);
-        }
-        if(resRedis[0].result===null && resRedis[1].result===null){
-            return this.rs(true,null);
-        }else if(resRedis[0].result===null || resRedis[1].result===null){
-            //只要有一个为空，那么任务及时无效的，执行删除
-            await Promise.all([
-                //删除任务
-                this.io(this.redis.zrem('delayQueue',keyDelayTask)),
-                //删除任务数据
-                this.io(this.redis.del(keyDelayTask))
-            ])
-            return this.rs(true,null);
-        }
-        return this.rs(true,{
-            data:resRedis[0].result && JSON.parse(resRedis[0].result),
-            date:resRedis[1].result && JSON.parse(resRedis[1].result)
-        });
-    }
-
-    //获取order延时任务数据
-    async getOrderDelay(delayKey){
-        const keyDelayTask=`1_delayData:${delayKey}`;
         const resRedis=await Promise.all([
             //获取任务数据
             this.io(this.redis.get(keyDelayTask)),
@@ -314,32 +240,6 @@ class Service extends SuperClass{
             }
         });
     }
-
-    /**
-     * 处理统计数据的日期
-     */
-    aggregateDataToPoint(items){
-        //将数据处理为对象
-        let dataObj={};
-        for(let i=0,len=items.length;i<len;i++){
-            const item=items[i];
-            let date;
-            if(item._id.year!==undefined && item._id.month!==undefined && item._id.date!==undefined){
-                date=`${item._id.year}/${item._id.month}/${item._id.date}`;
-            }else if(item._id.year!==undefined && item._id.month!==undefined){
-                date=`${item._id.year}/${item._id.month}`;
-            }else if(item._id.year!==undefined){
-                date=item._id.year;
-            }else{
-                date='';
-            }
-            item.date=date;
-            dataObj[date]=item;
-        }
-        return dataObj;
-    }
-
-    
 
     /**
      * 生成二维码

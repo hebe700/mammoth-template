@@ -23,10 +23,6 @@ class SuperClass{
         this.listLength=10; //分页列表数据长度
         this.listMaxLength=500;//分页允许查询的最大文档数量
         this.listMaxPage=50; //分页列表允许的最大页码数
-        
-        this.listPullLength=10;//微信端数据列表长度
-
-        this.periodLength=12;//小程序服务期限，12个月
 
         this.redisErr={message:'缓存系统错误'};
         this.redisNull={message:'缓存数据不存在，请刷新重试'};
