@@ -4,13 +4,7 @@ class businessMiddlewarService extends Service{
     constructor(props){
         super(props);
 
-        this.rs=(status,result=undefined,noLogin=false)=>{
-            if(noLogin){
-                return {
-                    status,
-                    user:noLogin
-                }
-            }
+        this.rs=(status,result=undefined)=>{
             if(result===undefined || result===undefined===null){
                 return {
                     status
@@ -26,6 +20,8 @@ class businessMiddlewarService extends Service{
                 message:str,
             };
         }
+        this.noLogin='身份验证失败'
+        this.noAuth='暂无权限'
 
         //验证规则，query与body通用
         this.rulesVali={
@@ -367,33 +363,6 @@ class businessMiddlewarService extends Service{
             }
         }
     }
-
-  
-    /**
-     * web端口商家用户身份验证中间件
-     * statusVali分为none、allVali、onlyFreezeVali
-     */
-    valiWebMerchant(statusVali='allVali'){
-        return async (ctx,next)=>{
-            //这里直接修改函数参数可能导致出现问题，有的请求到达时该参数是all，有的请求到达时是false，这里将参数值赋给变量，此后再修改变量可以避免这个问题
-            let isVerify=statusVali;
-            let serverRender=false;
-            //判断请求是否来自于服务端渲染，服务端渲染不会进程全流程验证，因为用户没有购买和配置时候也要渲染出页面
-            const headers=ctx.request.header;
-            if(ctx.request.header['from']!==undefined && ctx.request.header['from']==='axios'){
-                serverRender=true;
-                isVerify='none';
-            }
-            if(ctx.request.method==='GET'){
-                isVerify='none';
-            }
-            //执行下一个中间件
-            const result=await next();
-            return result;
-        }
-    };
-
-    
 }
 
 module.exports=businessMiddlewarService;

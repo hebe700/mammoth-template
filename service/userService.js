@@ -11,10 +11,8 @@ class UserService extends Service{
     /**
      * 测试
      */
-    async test(body,query,ctx){
-			//发送账号激活邮件
-			//ctx.third.EmailApi.sendEmail(body.email)
-			return this.succ('success')
+    async test(query,body,ctx){
+        return this.succ('okkk')
     }
 
 }

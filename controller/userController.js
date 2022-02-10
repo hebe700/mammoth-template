@@ -5,7 +5,7 @@ const that=new Controller({
 });
 
 /**
- * 用户注册
+ * 测试
  */
 that.reqGet(
     '/test',
@@ -20,13 +20,7 @@ that.reqGet(
 		// 		empty:[null,'password不能为空'],
 		// 		type:['string','password类型不合法'],
 		// 		maxLength:[16,'password不能超过16个字符']
-		// 	},
-		// 	'repassword':{
-		// 		empty:[null,'repassword不能为空'],
-		// 		type:['string','repassword类型不合法'],
-		// 		maxLength:[16,'repassword不能超过16个字符']
 		// 	}
-    // }
-)
+)()
 
 module.exports=that;
